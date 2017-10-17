@@ -45,14 +45,22 @@ int main(int, char*[]) {
 	TTF_Font *font{ TTF_OpenFont("../../res/ttf/saiyan.ttf", 80) };
 	if (font == nullptr) throw "No es pot initzializar";
 	SDL_Surface *tmpSurf{ TTF_RenderText_Blended(font, "My first sdl Game", SDL_Color{155,0,255,255}) };
+	SDL_Surface *tmpSurf1{ TTF_RenderText_Blended(font, "Play Music", SDL_Color{ 0,155,255,255 }) };
+	SDL_Surface *tmpSurf2{ TTF_RenderText_Blended(font, "Stop Music", SDL_Color{ 0,155,255,255 }) };
 	if (tmpSurf == nullptr) TTF_CloseFont(font), throw "Unable to creat the SDL SURFACE";
+	if (tmpSurf1 == nullptr) TTF_CloseFont(font), throw "Unable to creat the SDL SURFACE";
+	if (tmpSurf2 == nullptr) TTF_CloseFont(font), throw "Unable to creat the SDL SURFACE";
 	SDL_Texture *textTexture{ SDL_CreateTextureFromSurface(renderer, tmpSurf) };
+	SDL_Texture *textTexture1{ SDL_CreateTextureFromSurface(renderer, tmpSurf1) };
+	SDL_Texture *textTexture2{ SDL_CreateTextureFromSurface(renderer, tmpSurf2) };
 	SDL_Rect textRect{ 100,50,tmpSurf->w, tmpSurf->h };//witdh and height 
+	SDL_Rect textRect1{ 100,200,tmpSurf1->w, tmpSurf1->h };//witdh and height 
+	SDL_Rect textRect2{ 100,300,tmpSurf2->w, tmpSurf2->h };//witdh and height 
 	SDL_FreeSurface(tmpSurf);
 	TTF_CloseFont(font);
 
 	// --- AUDIO ---
-	if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024)==-1) {// 1 = MONO 2=STEREO, EL -1 SIGNIFICA ES QUE ESTA EN LOOP
+	if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024)==-1) {// 1 = MONO 2=STEREO
 		throw "Unable to initialize the muscic";
 	}
 	Mix_Music *sountrack{ Mix_LoadMUS("../../res/au/mainTheme.mp3") };
@@ -70,7 +78,8 @@ int main(int, char*[]) {
 			switch (event.type) {
 			case SDL_QUIT:		isRunning = false; break;
 			case SDL_KEYDOWN:	if (event.key.keysym.sym == SDLK_ESCAPE) isRunning = false; break;
-			case SDL_MOUSEMOTION:playerRect.x = event.motion.x-50; playerRect.y = event.motion.y-50; break;//evento de movimiento del player
+			case SDL_MOUSEMOTION:
+				playerTarget.x = event.motion.x-playerRect.w/2; playerTarget.y = event.motion.y- playerRect.w / 2; break;//evento de movimiento del player
 			default:;
 			}
 		}
@@ -85,6 +94,8 @@ int main(int, char*[]) {
 		SDL_RenderCopy(renderer, bgTexture, nullptr, &bgRect); // aqui dibujamos la textura usando un rectangulo - IMPORTANTE -
 		SDL_RenderCopy(renderer, playerTexture, nullptr, &playerRect);//dibujamos la textura del nuvol quinton
 		SDL_RenderCopy(renderer, textTexture, nullptr, &textRect);
+		SDL_RenderCopy(renderer, textTexture1, nullptr, &textRect1);
+		SDL_RenderCopy(renderer, textTexture2, nullptr, &textRect2);
 		SDL_RenderPresent(renderer);//solo 1
 			//Animated Sprite
 		SDL_RenderPresent(renderer);
