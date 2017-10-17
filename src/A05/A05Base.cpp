@@ -1,6 +1,7 @@
 #include <SDL.h>		// Always needs to be included for an SDL app
 #include <SDL_image.h>  //Libreria que controla imagenes
 #include <SDL_ttf.h>	//libreria de texto
+#include <SDL_mixer.h>  //libreria de musica
 
 //Game general information
 #define SCREEN_WIDTH 800
@@ -15,6 +16,9 @@ int main(int, char*[]) {
 	if (!(IMG_Init(imgFlags) & imgFlags)) throw "Error: SDL_image init";//image init
 	//-------
 	if (TTF_Init() != 0) throw "No es pot inicialitzar SDL_TTF";//texto init
+	//-------
+	const Uint8 mixFlags{ MIX_INIT_MP3 | MIX_INIT_OGG };
+	if (!(Mix_Init(mixFlags)& mixFlags)) throw "Eroor: SDL:MIXER INIT";
 
 	// --- WINDOW ---
 	SDL_Window *window{ SDL_CreateWindow("SDL...", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN) };
@@ -46,7 +50,16 @@ int main(int, char*[]) {
 	SDL_Rect textRect{ 100,50,tmpSurf->w, tmpSurf->h };//witdh and height 
 	SDL_FreeSurface(tmpSurf);
 	TTF_CloseFont(font);
+
 	// --- AUDIO ---
+	if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024)==-1) {
+		throw "Unable to initialize the muscic";
+	}
+	Mix_Music *sountrack{ Mix_LoadMUS("../../res/au/mainTheme.mp3") };
+	if (!sountrack)throw "Unable to load";
+	Mix_VolumeMusic(MIX_MAX_VOLUME / 2);
+	Mix_PlayMusic(sountrack, -1);
+
 
 	// --- GAME LOOP ---
 	SDL_Event event;
@@ -82,12 +95,14 @@ int main(int, char*[]) {
 	SDL_DestroyTexture(bgTexture);//destruye el bg
 	SDL_DestroyTexture(playerTexture);//destuye al player
 	SDL_DestroyTexture(textTexture);//destruyo el texto
+	Mix_CloseAudio(); //cierra la musica no se destruye
 	SDL_DestroyRenderer(renderer);//primero destruye al render por que esta referenciado por el window
 	SDL_DestroyWindow(window);
 
 	// --- QUIT ---
 	IMG_Quit(); //Quit de las imagenes
-	TTF_Quit();
+	TTF_Quit(); //Quit del texto
+	Mix_Quit(); //quit de la musica
 	SDL_Quit();//SIEMPRE VA ULTIMO
 	return 0;
 }
