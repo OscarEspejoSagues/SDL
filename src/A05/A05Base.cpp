@@ -11,12 +11,12 @@ int main(int, char*[]) {
 
 	// --- INIT ---
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) throw "No es pot inicialitzar SDL subsystems";
-	//-------
+	//-------BG
 	const Uint8 imgFlags{ IMG_INIT_PNG | IMG_INIT_JPG };
 	if (!(IMG_Init(imgFlags) & imgFlags)) throw "Error: SDL_image init";//image init
-	//-------
+	//-------TEXT
 	if (TTF_Init() != 0) throw "No es pot inicialitzar SDL_TTF";//texto init
-	//-------
+	//-------MUSICA
 	const Uint8 mixFlags{ MIX_INIT_MP3 | MIX_INIT_OGG };
 	if (!(Mix_Init(mixFlags)& mixFlags)) throw "Eroor: SDL:MIXER INIT";
 
@@ -52,14 +52,14 @@ int main(int, char*[]) {
 	TTF_CloseFont(font);
 
 	// --- AUDIO ---
-	if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024)==-1) {
+	if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 1024)==-1) {// 1 = MONO 2=STEREO, EL -1 SIGNIFICA ES QUE ESTA EN LOOP
 		throw "Unable to initialize the muscic";
 	}
 	Mix_Music *sountrack{ Mix_LoadMUS("../../res/au/mainTheme.mp3") };
 	if (!sountrack)throw "Unable to load";
 	Mix_VolumeMusic(MIX_MAX_VOLUME / 2);
 	Mix_PlayMusic(sountrack, -1);
-
+	//FUNCIONES WORTH Mix_PlayingMusic(), Mix_PauseMusic(), Mix_PauseMusic()
 
 	// --- GAME LOOP ---
 	SDL_Event event;
