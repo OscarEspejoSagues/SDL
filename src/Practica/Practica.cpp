@@ -26,6 +26,10 @@ int main(int, char*[]) {
 	SDL_Texture *bgTexture{ IMG_LoadTexture(renderer, "../../res/img/bgCastle.jpg") };
 	if (bgTexture == nullptr) throw "No s'han pogut crear les textures";
 	SDL_Rect bgRect{ 0,0,SCREEN_WIDTH, SCREEN_HEIGHT };
+	//Monedillas
+	SDL_Texture *moneda{ IMG_LoadTexture(renderer, "../../res/img/gold.jpg") };
+	SDL_Rect monedaRect{ 0,0,10,10 };
+
 		// --- Animated Sprite ---
 
 	// --- TEXT ---
@@ -51,7 +55,7 @@ int main(int, char*[]) {
 			//Background
 		SDL_RenderClear(renderer);//limpia pantalla SIEMPRE AL PRINCIPIO DEL DRAW
 		SDL_RenderCopy(renderer, bgTexture, nullptr, &bgRect); // aqui dibujamos la textura usando un rectangulo - IMPORTANTE -
-	
+		SDL_RenderCopy(renderer, moneda, nullptr, &monedaRect);
 			//Animated Sprite
 		SDL_RenderPresent(renderer);
 
@@ -59,6 +63,7 @@ int main(int, char*[]) {
 
 	// --- DESTROY ---
 	SDL_DestroyTexture(bgTexture);//destruye el bg
+	SDL_DestroyTexture(moneda);//destruye el bg
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 
