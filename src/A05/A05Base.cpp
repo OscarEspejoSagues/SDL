@@ -6,6 +6,7 @@
 //Game general information
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
+#define	FPS 60 //definimos los frame por segundo
 
 int main(int, char*[]) {
 
@@ -35,11 +36,24 @@ int main(int, char*[]) {
 	SDL_Rect bgRect{ 0,0,SCREEN_WIDTH, SCREEN_HEIGHT };
 
 	//Player
-	SDL_Texture *playerTexture{ IMG_LoadTexture(renderer, "../../res/img/kintoun.png") };
+	/*SDL_Texture *playerTexture{ IMG_LoadTexture(renderer, "../../res/img/kintoun.png") };
 	if (playerTexture == nullptr) throw "No s'han pogut crear les textures";
-	SDL_Rect playerRect{ 0,0,350,189 };
+	SDL_Rect playerRect{ 0,0,350,189 };*/
 	SDL_Rect playerTarget{ 0,0,100,100 };//player target para hacerlo mas fino el movimiento
-		// --- Animated Sprite ---
+	
+	// --- Animated Sprite ---
+	SDL_Texture *playerTexture1{ IMG_LoadTexture(renderer, "../../res/img/sp01.png") };//textura cargada
+	SDL_Rect playerRect1, playerPosition1;//rectangulos
+	int textWidth, textHeight, frameWidth, frameHeight;//tamaños
+	SDL:SDL_QueryTexture(playerTexture1, NULL, NULL, &textWidth, &textHeight);//modifica la textWidth y la textHeight al tamaño del sprite del player y le asigna el valor del tamaño
+	frameWidth = textWidth / 6;//el tamaño del frame de la animacion es el tamaño total / 6 ya que son 6 movimientos
+	frameHeight = textHeight / 1;//exactamente lo mismo pero con el largo
+	playerPosition1.x = playerPosition1.y = 0;
+	playerRect1.x = playerRect1.y = 0;
+	playerPosition1.h = playerRect1.h = frameHeight;
+	playerPosition1.w = playerRect1.w = frameWidth;
+	int frameTime = 0;
+
 
 	// --- TEXT ---
 	TTF_Font *font{ TTF_OpenFont("../../res/ttf/saiyan.ttf", 80) };
@@ -67,7 +81,7 @@ int main(int, char*[]) {
 	if (!sountrack)throw "Unable to load";
 	Mix_VolumeMusic(MIX_MAX_VOLUME / 2);
 	Mix_PlayMusic(sountrack, -1);
-	//FUNCIONES WORTH Mix_PlayingMusic(), Mix_PauseMusic(), Mix_PauseMusic()
+	//FUNCIONES WORTH Mix_PlayingMusic(), Mix_PauseMusic(), Mix_PauseMusic(), Mix_HaltMusic()
 
 	// --- GAME LOOP ---
 	SDL_Event event;
@@ -79,32 +93,44 @@ int main(int, char*[]) {
 			case SDL_QUIT:		isRunning = false; break;
 			case SDL_KEYDOWN:	if (event.key.keysym.sym == SDLK_ESCAPE) isRunning = false; break;
 			case SDL_MOUSEMOTION:
-				playerTarget.x = event.motion.x-playerRect.w/2; playerTarget.y = event.motion.y- playerRect.w / 2; break;//evento de movimiento del player
-			default:;
+				//playerTarget.x = event.motion.x - playerRect.w/2; //asignamos las coordenadas pero aplicamos el cambio en el update
+				//playerTarget.y = event.motion.y - playerRect.h/2; break;//evento de movimiento del player
+				default:;
 			}
 		}
 
-		// UPDATE
-		playerRect.x += (playerTarget.x - playerRect.x) / 10;
-		playerRect.y += (playerTarget.y - playerRect.y) / 10;
+		// UPDATE aqui va la logica del codigo
+		/*playerRect.x += (playerTarget.x - playerRect.x) / 10;
+		playerRect.y += (playerTarget.y - playerRect.y) / 10;*/
+
+		frameTime++;
+		if (FPS / frameTime <= 9) {
+			frameTime = 0;
+			playerRect1.x += frameWidth;
+			if (playerRect1.x >= textWidth) {
+				playerRect1.x = 0;
+			}
+		}
+		
 
 		// DRAW
 			//Background
 		SDL_RenderClear(renderer);//limpia pantalla SIEMPRE AL PRINCIPIO DEL DRAW
 		SDL_RenderCopy(renderer, bgTexture, nullptr, &bgRect); // aqui dibujamos la textura usando un rectangulo - IMPORTANTE -
-		SDL_RenderCopy(renderer, playerTexture, nullptr, &playerRect);//dibujamos la textura del nuvol quinton
+		//SDL_RenderCopy(renderer, playerTexture, nullptr, &playerRect);//dibujamos la textura del nuvol quinton
 		SDL_RenderCopy(renderer, textTexture, nullptr, &textRect);
 		SDL_RenderCopy(renderer, textTexture1, nullptr, &textRect1);
 		SDL_RenderCopy(renderer, textTexture2, nullptr, &textRect2);
-		SDL_RenderPresent(renderer);//solo 1
+
 			//Animated Sprite
-		SDL_RenderPresent(renderer);
+		SDL_RenderCopy(renderer, playerTexture1, &playerRect1, &playerPosition1);
+		SDL_RenderPresent(renderer);//SOLO 1
 
 	}
 
 	// --- DESTROY ---
 	SDL_DestroyTexture(bgTexture);//destruye el bg
-	SDL_DestroyTexture(playerTexture);//destuye al player
+	//SDL_DestroyTexture(playerTexture);//destuye al player
 	SDL_DestroyTexture(textTexture);//destruyo el texto
 	Mix_CloseAudio(); //cierra la musica no se destruye
 	SDL_DestroyRenderer(renderer);//primero destruye al render por que esta referenciado por el window
