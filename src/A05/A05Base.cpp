@@ -2,6 +2,8 @@
 #include <SDL_image.h>  //Libreria que controla imagenes
 #include <SDL_ttf.h>	//libreria de texto
 #include <SDL_mixer.h>  //libreria de musica
+#include <iostream>
+#include <time.h>
 
 //Game general information
 #define SCREEN_WIDTH 800
@@ -47,6 +49,8 @@
 
 */
 
+
+/*2 personajes animados con movimiento, sacos que recoger, no pasar del horizonte*/
 
 
 
@@ -124,6 +128,11 @@ int main(int, char*[]) {
 	Mix_VolumeMusic(MIX_MAX_VOLUME / 2);
 	Mix_PlayMusic(sountrack, -1);
 	//FUNCIONES WORTH Mix_PlayingMusic(), Mix_PauseMusic(), Mix_PauseMusic(), Mix_HaltMusic()
+	
+	//-----TIME------
+	clock_t lastTime = clock();
+	float timeDown = 10;
+	float deltaTime = 0;
 
 	// --- GAME LOOP ---
 	SDL_Event event;
@@ -144,6 +153,12 @@ int main(int, char*[]) {
 		// UPDATE aqui va la logica del codigo
 		/*playerRect.x += (playerTarget.x - playerRect.x) / 10;
 		playerRect.y += (playerTarget.y - playerRect.y) / 10;*/
+
+		deltaTime = (clock() - lastTime);
+		lastTime = clock();
+		deltaTime /= CLOCKS_PER_SEC;
+		timeDown -= deltaTime;
+		std::cout << timeDown << std::endl;
 
 		frameTime++;
 		if (FPS / frameTime <= 9) {
