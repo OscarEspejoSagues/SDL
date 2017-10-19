@@ -8,6 +8,48 @@
 #define SCREEN_HEIGHT 600
 #define	FPS 60 //definimos los frame por segundo
 
+//Scene Manatgement
+/*
+	controlar el delta time para que las clases no se chafen entre ellas
+	tambien deberian conocer al render ya que este conoce al window y le permita mostrar en pantalla
+	
+	SCENE MANAGER
+	enum class GameState{Play, Exit, Menu};
+
+	//Game Loop
+		SDL_event event;
+		GameState gamestat = GameState::Menu;
+
+		while(gamestat != GameState::Exit){
+			while(SDL_PollEvent(&event)){
+				switch(event.type){
+					case SDL_QUIT:
+						gamestate = GameState::Exit;
+						break;
+						
+						case GameState::Play:
+							//EventHandlePlay();
+							//UpdatePlay();
+							//DrawPlay();
+							break;
+						case GameState::Exit:
+							break;
+						case GameState::Menu:
+							//EventHandleMenu();
+							//UpdateMenu();
+							//DrawMenu();
+							break;
+				}
+			}
+		}
+
+
+
+*/
+
+
+
+
 int main(int, char*[]) {
 
 	// --- INIT ---
