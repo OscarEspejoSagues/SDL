@@ -7,7 +7,26 @@
 #include <sstream>
 #include <string.h>
 
+/*
+	Colisiones:
+	
+	
+	nameespace Colisions {
+		bool Colision(sdl_rect rect1, sdl_rect2){
+			return supercondicion comparando los 4 puntos del rect
+		}
 
+		bool ColisionWalls(sdl_rect inside, sd_rect contenedor){
+			return con 4 condiciones
+		}
+	}
+
+		hacer un header donde guardas estas funciones como Colision.h
+
+		PARA LLAMAR EN EL MAIN
+			como el cout
+		Colisions::Colision(.....)
+*/
 
 
 //Game general information
@@ -131,7 +150,7 @@ void play(SDL_Window *window, SDL_Renderer *renderer) {
 	SDL_Texture *playerTexture1{ IMG_LoadTexture(renderer, "../../res/img/spCastle.png") };//textura cargada
 	SDL_Rect playerRect1, playerPosition1;//rectangulos
 	int textWidth, textHeight, frameWidth, frameHeight;//tamaños
-SDL:SDL_QueryTexture(playerTexture1, NULL, NULL, &textWidth, &textHeight);
+	SDL:SDL_QueryTexture(playerTexture1, NULL, NULL, &textWidth, &textHeight);
 	frameWidth = textWidth / 12;
 	frameHeight = textHeight / 8;
 	playerPosition1.x = playerPosition1.y = SCREEN_WIDTH / 2;
@@ -167,7 +186,7 @@ SDL:SDL_QueryTexture(playerTexture1, NULL, NULL, &textWidth, &textHeight);
 				if (event.key.keysym.sym == SDLK_RIGHT && playerPosition1.x <= 770) {
 					playerPosition1.x += 4;
 					std::cout << "Posicion " << playerPosition1.x << " : " << playerPosition1.y << std::endl;
-					movR = true;
+					movR = true;//hacerlo con enum class es mas fino y mas legible
 					movL = false;
 					movBot = false;
 					movTop = false;
