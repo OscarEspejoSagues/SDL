@@ -50,7 +50,7 @@ void mainMenu(SDL_Window *window, SDL_Renderer *renderer) {
 	SDL_Surface *tmpSurf{ TTF_RenderText_Blended(font, "Play!", SDL_Color{ 100,100,255,255 }) };
 	if (tmpSurf == nullptr) TTF_CloseFont(font), throw "Unable to creat the SDL SURFACE";
 	SDL_Texture *textTexture{ SDL_CreateTextureFromSurface(renderer, tmpSurf) };
-	SDL_Rect textRect{ SCREEN_WIDTH / 2 + 50,SCREEN_HEIGHT / 2,tmpSurf->w, tmpSurf->h };//witdh and height 
+	SDL_Rect textRect{ SCREEN_WIDTH / 2 - 50,SCREEN_HEIGHT / 2-50,tmpSurf->w, tmpSurf->h };//witdh and height 
 	SDL_FreeSurface(tmpSurf);
 	TTF_CloseFont(font);
 
