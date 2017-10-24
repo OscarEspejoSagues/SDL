@@ -5,7 +5,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sstream>
-#include <string>
+#include <string.h>
+
+
 
 
 //Game general information
@@ -23,45 +25,78 @@ int posX5, posY5;
 
 int puntuasao = 0;
 
-int main(int, char*[]) {
-	srand(time(NULL));
+enum class GameState { Play, Menu, End };
+GameState gamestat = GameState::Menu;
 
+
+
+void mainMenu(SDL_Window *window, SDL_Renderer *renderer) {
+	//---Hover
+	const Uint8 imgFlags{ IMG_INIT_PNG | IMG_INIT_JPG };
+	if (!(IMG_Init(imgFlags) & imgFlags)) throw "Error: SDL_image init";
+
+	//Text
+	if (TTF_Init() != 0) throw "No es pot inicialitzar SDL_TTF";//texto init
+
+																//Sprites
+																//----BG
+	SDL_Texture *bg{ IMG_LoadTexture(renderer, "../../res/img/bgCastle.jpg") };
+	if (bg == nullptr) throw "No s'han pogut crear les textures";
+	SDL_Rect bgRect{ 0,0, SCREEN_WIDTH, SCREEN_HEIGHT };
+
+	//Text
+	TTF_Font *font{ TTF_OpenFont("../../res/ttf/saiyan.ttf", 80) };
+	if (font == nullptr) throw "No es pot initzializar";
+	SDL_Surface *tmpSurf{ TTF_RenderText_Blended(font, "Play!", SDL_Color{ 100,100,255,255 }) };
+	if (tmpSurf == nullptr) TTF_CloseFont(font), throw "Unable to creat the SDL SURFACE";
+	SDL_Texture *textTexture{ SDL_CreateTextureFromSurface(renderer, tmpSurf) };
+	SDL_Rect textRect{ SCREEN_WIDTH / 2 + 50,SCREEN_HEIGHT / 2,tmpSurf->w, tmpSurf->h };//witdh and height 
+	SDL_FreeSurface(tmpSurf);
+	TTF_CloseFont(font);
+
+	while (gamestat == GameState::Menu) {
+		SDL_Event menucontroller;
+		while (SDL_PollEvent(&menucontroller)) {
+			switch (menucontroller.type) {
+			case SDL_KEYDOWN:
+				if (menucontroller.key.keysym.sym == SDLK_DOWN) {
+					gamestat = GameState::Play;
+				}
+			}
+		}
+		SDL_RenderClear(renderer);
+		SDL_RenderCopy(renderer, bg, nullptr, &bgRect);
+		SDL_RenderCopy(renderer, textTexture, nullptr, &textRect);
+		SDL_RenderPresent(renderer);//darle las gracias al dios Balas de la programasao
+	}
+	SDL_DestroyTexture(bg);
+	SDL_DestroyTexture(textTexture);
+}
+
+void play(SDL_Window *window, SDL_Renderer *renderer) {
+	srand(time(NULL));
 	posX = 1 + rand() % (768 - 1);
 	posY = 147 + rand() % (563 - 144);
-
 	posX1 = 1 + rand() % (768 - 1);
 	posY1 = 147 + rand() % (563 - 144);
-
 	posX2 = 1 + rand() % (768 - 1);
 	posY2 = 147 + rand() % (563 - 144);
-
 	posX3 = 1 + rand() % (768 - 1);
 	posY3 = 147 + rand() % (563 - 144);
-
 	posX4 = 1 + rand() % (768 - 1);
 	posY4 = 147 + rand() % (563 - 144);
-
 	posX5 = 1 + rand() % (768 - 1);
 	posY5 = 147 + rand() % (563 - 144);
 
-
-	// --- INIT ---
-	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) throw "No es pot inicialitzar SDL subsystems";
 	//---BG
 	const Uint8 imgFlags{ IMG_INIT_PNG | IMG_INIT_JPG };
 	if (!(IMG_Init(imgFlags) & imgFlags)) throw "Error: SDL_image init";//inicializo al bg
 
-																		// --- WINDOW ---
-	SDL_Window *window{ SDL_CreateWindow("Castle Stealers", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN) };
-	if (window == nullptr) throw "No es pot inicialitzar SDL_Window";
-	//Text
+																		//Text
 	if (TTF_Init() != 0) throw "No es pot inicialitzar SDL_TTF";//texto init
-																// --- RENDERER ---
-	SDL_Renderer *renderer{ SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC) };
-	if (renderer == nullptr) throw "No es pot inicialitzar SDL_Renderer";
 
-	// --- SPRITES ---
-	//BackGround
+																// --- SPRITES ---
+																//BackGround
 	SDL_Texture *bgTexture{ IMG_LoadTexture(renderer, "../../res/img/bgCastle.jpg") };
 	if (bgTexture == nullptr) throw "No s'han pogut crear les textures";
 	SDL_Rect bgRect{ 0,0,SCREEN_WIDTH, SCREEN_HEIGHT };
@@ -116,8 +151,6 @@ SDL:SDL_QueryTexture(playerTexture1, NULL, NULL, &textWidth, &textHeight);
 	SDL_Rect textRect{ 0,0,tmpSurf->w, tmpSurf->h };//witdh and height 
 	SDL_FreeSurface(tmpSurf);
 	TTF_CloseFont(font);
-	// --- AUDIO ---
-
 
 	// --- GAME LOOP ---
 	SDL_Event event;
@@ -259,6 +292,40 @@ SDL:SDL_QueryTexture(playerTexture1, NULL, NULL, &textWidth, &textHeight);
 	SDL_DestroyTexture(moneda3);
 	SDL_DestroyTexture(moneda4);
 	SDL_DestroyTexture(moneda5);
+
+	gamestat = GameState::End;
+}
+
+
+int main(int, char*[]) {
+	bool theGame = true;
+	// --- INIT ---
+	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) throw "No es pot inicialitzar SDL subsystems";
+	// --- WINDOW ---
+	SDL_Window *window{ SDL_CreateWindow("Castle Stealers", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN) };
+	if (window == nullptr) throw "No es pot inicialitzar SDL_Window";
+	// --- RENDERER ---
+	SDL_Renderer *renderer{ SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC) };
+	if (renderer == nullptr) throw "No es pot inicialitzar SDL_Renderer";
+
+	while (theGame)
+	{
+		switch (gamestat) {
+		case GameState::Menu:
+			mainMenu(window, renderer);
+			break;
+		case GameState::Play:
+			play(window, renderer);
+			break;
+		case GameState::End:
+			theGame = false;
+			break;
+		default:
+			break;
+		}
+	}
+
+
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 
@@ -268,4 +335,5 @@ SDL:SDL_QueryTexture(playerTexture1, NULL, NULL, &textWidth, &textHeight);
 	SDL_Quit();
 	return 0;
 }
+
 
